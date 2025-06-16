@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lightbox Gallery</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background: #111;
+      color: #fff;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+      padding: 2rem;
+    }
+
+    img {
+      width: 300px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    img:hover {
+      transform: scale(1.05);
+    }
+
+    /* Lightbox Overlay */
+    .lightbox-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.95);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: row;
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .lightbox-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .lightbox-img {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 10px;
+      transition: transform 0.3s ease;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 3rem;
+      color: #fff;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 0.5rem 1rem;
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 10000;
+      transition: background 0.2s ease;
+    }
+
+    .arrow:hover {
+      background: rgba(255, 77, 0, 0.6);
+    }
+
+    .arrow.left {
+      left: 30px;
+    }
+
+    .arrow.right {
+      right: 30px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Example gallery -->
+  <img src="https://i.imgur.com/9gnQ3XV.jpg" alt="img1" />
+  <img src="https://i.imgur.com/yvSXR4j.jpg" alt="img2" />
+  <img src="https://i.imgur.com/X7JRU6U.jpg" alt="img3" />
+  <img src="https://i.imgur.com/QGlTVga.jpg" alt="img4" />
+  <img src="https://i.imgur.com/uNDfNsj.jpg" alt="img5" />
+
+  <!-- Lightbox -->
+  <div class="lightbox-overlay" id="lightbox">
+    <span class="arrow left" id="prev">&#10094;</span>
+    <img src="" alt="fullscreen" class="lightbox-img" id="lightbox-img" />
+    <span class="arrow right" id="next">&#10095;</span>
+  </div>
+
+  <script>
+    const allImages = [...document.querySelectorAll('img')];
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const prevBtn = document.getElementById('prev');
+    const nextBtn = document.getElementById('next');
+
+    let currentIndex = 0;
+
+    function openLightbox(index) {
+      currentIndex = index;
+      lightboxImg.src = allImages[currentIndex].src;
+      lightbox.classList.add('active');
+    }
+
+    function changeImage(direction) {
+      currentIndex = (currentIndex + direction + allImages.length) % allImages.length;
+      lightboxImg.src = allImages[currentIndex].src;
+    }
+
+    allImages.forEach((img, index) => {
+      img.addEventListener('click', () => openLightbox(index));
+    });
+
+    prevBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      changeImage(-1);
+    });
+
+    nextBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      changeImage(1);
+    });
+
+    lightbox.addEventListener('click', () => {
+      lightbox.classList.remove('active');
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (!lightbox.classList.contains('active')) return;
+
+      if (e.key === 'ArrowRight') changeImage(1);
+      if (e.key === 'ArrowLeft') changeImage(-1);
+      if (e.key === 'Escape') lightbox.classList.remove('active');
+    });
+  </script>
+</body>
+
+</html>
